@@ -1,0 +1,13 @@
+{
+  "background_color": "#0f0f12",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "MOTO SERVICE",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "MOTO SERVICE",
+  "start_url": "/",
+  "theme_color": "#ff4d00",
+  "id": "moto-service",
+  "description": "오토바이 정비 기록 관리 시스템"
+}
