@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="정비앱">
+<meta name="theme-color" content="#ff4d00">
+<title>🏍 MOTO SERVICE</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--red:#ff4d00;--red2:#ff6a2a;--bg:#0f0f12;--bg2:#16161c;--bg3:#1a1a20;--bg4:#111116;--border:#222228;--border2:#2a2a32;--text:#e8e8ef;--muted:#888;--dim:#555;--dim2:#444;--mono:'JetBrains Mono',monospace}
+  html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif}
+  ::-webkit-scrollbar{width:4px}
+  ::-webkit-scrollbar-thumb{background:var(--red);border-radius:2px}
+  input,textarea,button{font-family:'Noto Sans KR',sans-serif}
+  input::placeholder,textarea::placeholder{color:var(--dim2)}
+  input:focus,textarea:focus{outline:none;border-color:var(--red)!important}
+  .inp{width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:11px 14px;font-size:14px}
+  .inp:focus{border-color:var(--red)}
+  .btn-red{background:var(--red);color:#fff;border:none;cursor:pointer;padding:12px 18px;font-size:14px;font-weight:700;transition:background .15s}
+  .btn-red:hover,.btn-red:active{background:var(--red2)}
+  .btn-ghost{background:transparent;color:#999;border:1px solid var(--border2);cursor:pointer;padding:9px 16px;font-size:13px;transition:all .15s}
+  .btn-ghost:hover,.btn-ghost:active{border-color:var(--red);color:var(--red)}
+  .card{background:var(--bg2);border:1px solid var(--border);padding:16px 18px}
+  .lbl{font-size:11px;color:var(--muted);letter-spacing:.1em;font-weight:700;margin-bottom:6px;display:block}
+  .tag{background:#1f1f26;color:#ddd;font-size:13px;padding:4px 11px;border:1px solid var(--border2);display:inline-block;margin:2px}
+  .or-tag{background:#ff4d0022;color:#ff6a2a;font-size:11px;font-weight:700;padding:1px 7px;border:1px solid #ff4d0044;display:inline-block}
+  .mono{font-family:var(--mono)}
+  .page{display:none;padding:20px 14px;max-width:840px;margin:0 auto}
+  .page.active{display:block;animation:fadeUp .2s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+  .pop{animation:popIn .28s cubic-bezier(.34,1.56,.64,1)}
+  #hdr{background:#0a0a0d;border-bottom:2px solid var(--red);position:sticky;top:0;z-index:99}
+  #hdr-top{display:flex;align-items:center;justify-content:space-between;padding:0 14px;height:50px}
+  #hdr-nav{display:flex;align-items:stretch;border-top:1px solid #1a1a1a;}
+  .hdr-logo{display:flex;align-items:center;gap:10px}
+  .hdr-icon{width:30px;height:30px;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .nav-btn{background:transparent;color:#777;border:none;cursor:pointer;padding:10px 4px;font-size:12px;font-weight:700;transition:all .15s;white-space:nowrap}
+  .nav-btn.active{background:var(--red);color:#fff}
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);align-items:center;justify-content:center;z-index:300}
+  .modal-bg.open{display:flex}
+  .modal{background:var(--bg2);border:1px solid #333;padding:26px 22px;max-width:380px;width:92%}
+  #toast{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid #333;color:#fff;padding:11px 22px;font-size:14px;font-weight:600;z-index:999;white-space:nowrap}
+  .photo-drop{border:2px dashed var(--border2);background:var(--bg4);padding:18px;text-align:center;cursor:pointer;transition:all .15s}
+  .photo-drop:hover{border-color:var(--red);background:var(--bg3)}
+  .photo-thumb{width:72px;height:72px;object-fit:cover;border:1px solid var(--border2);cursor:pointer}
+  .photo-wrap{position:relative;display:inline-block;margin:3px}
+  .photo-del{position:absolute;top:2px;right:2px;background:#c0392b;color:#fff;border:none;width:18px;height:18px;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;line-height:1}
+  #lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);align-items:center;justify-content:center;z-index:500}
+  #lb.open{display:flex}
+  .cust-row{cursor:pointer;display:flex;align-items:center;gap:14px;background:var(--bg2);border:1px solid var(--border);padding:16px 18px;transition:border-color .15s;margin-bottom:8px}
+  .cust-row:hover{border-color:#333}
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+  .stat-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+  .err-box{background:#2a1010;border:1px solid #c0392b;color:#e74c3c;padding:10px 14px;font-size:13px;margin-bottom:16px}
+  .bar-wrap{flex:1;height:20px;background:var(--bg3);position:relative}
+  .bar-fill{position:absolute;left:0;top:0;height:100%}
+  .bar-lbl{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#fff;font-family:var(--mono)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  @media(max-width:400px){.stat-grid{grid-template-columns:1fr 1fr}.stat-grid > :last-child{grid-column:span 2}}
+  .saved-wrap{display:flex;flex-direction:column;align-items:center;padding:36px 16px}
+  .saved-check{width:76px;height:76px;border-radius:50%;background:#162416;border:3px solid #2ecc71;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:18px}
+  /* 로딩 오버레이 */
+  #loading-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:14px}
+  #loading-overlay.show{display:flex}
+  .spinner{width:40px;height:40px;border:3px solid #333;border-top:3px solid var(--red);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  /* 로그인 화면 */
+  #page-login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:30px 20px}
+  .login-box{background:var(--bg2);border:1px solid var(--border);padding:32px 28px;width:100%;max-width:360px}
+  /* 동기화 상태 */
+  #sync-status{font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:2px}
+  .sync-ok{background:#0d2b0d;color:#2ecc71;border:1px solid #1a4a1a}
+  .sync-off{background:#2b1a0d;color:#e67e22;border:1px solid #4a2a0d}
+  .sync-err{background:#2b0d0d;color:#e74c3c;border:1px solid #4a1a1a}
+</style>
+</head>
+<body>
+
+<!-- 로딩 오버레이 -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div style="color:#aaa;font-size:13px" id="loading-msg">불러오는 중...</div>
+</div>
+
+<!-- 로그인 화면 -->
+<div id="page-login">
+  <div class="login-box">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:36px;margin-bottom:10px">🏍</div>
+      <div style="font-size:20px;font-weight:900;color:#fff;letter-spacing:.1em">MOTO SERVICE</div>
+      <div style="font-size:12px;color:#666;margin-top:6px">정비 기록 관리 시스템</div>
+    </div>
+    <div id="login-err" class="err-box" style="display:none"></div>
+    <div style="margin-bottom:14px">
+      <label class="lbl">이메일</label>
+      <input class="inp" id="login-email" type="email" placeholder="이메일 주소">
+    </div>
+    <div style="margin-bottom:20px">
+      <label class="lbl">비밀번호</label>
+      <input class="inp" id="login-pw" type="password" placeholder="비밀번호" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-red" style="width:100%;padding:14px;font-size:15px;margin-bottom:10px" onclick="doLogin()">로그인</button>
+    <button class="btn-ghost" style="width:100%;padding:12px" onclick="doRegister()">처음 사용 · 계정 만들기</button>
+    <div style="text-align:center;margin-top:16px">
+      <button style="background:none;border:none;color:#666;font-size:12px;cursor:pointer;text-decoration:underline" onclick="doResetPw()">비밀번호 찾기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 메인 앱 (로그인 후) -->
+<div id="app" style="display:none">
+
+<!-- HEADER -->
+<div id="hdr">
+  <div id="hdr-top">
+    <div class="hdr-logo">
+      <div class="hdr-icon">🏍</div>
+      <div style="font-size:13px;font-weight:900;letter-spacing:.1em;color:#fff">MOTO SERVICE</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="sync-status" class="sync-ok">☁️ 연결됨</span>
+      <button class="btn-ghost" style="font-size:11px;padding:5px 10px;border-color:#333" onclick="doLogout()">로그아웃</button>
+    </div>
+  </div>
+  <div id="hdr-nav">
+    <button class="nav-btn active" id="nav-search" onclick="goPage('search')" style="flex:1">고객 검색</button>
+    <button class="nav-btn" id="nav-form" onclick="goPage('form')" style="flex:1">+ 정비 입력</button>
+    <button class="nav-btn" id="nav-stats" onclick="goPage('stats')" style="flex:1">통계</button>
+    <button class="btn-ghost" onclick="openSync()" style="flex:1;font-size:12px;padding:8px 4px;border:none;border-left:1px solid #1a1a1a;white-space:nowrap">💾 백업</button>
+  </div>
+</div>
+
+<!-- SEARCH PAGE -->
+<div class="page active" id="page-search">
+  <div style="position:relative;margin-bottom:14px">
+    <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--dim);pointer-events:none">🔍</span>
+    <input class="inp" id="search-input" style="padding-left:40px;height:46px;font-size:15px"
+      placeholder="번호판 · 전화번호 · 이름 검색" oninput="renderSearch()">
+  </div>
+  <div id="search-info" style="font-size:11px;color:var(--dim);margin-bottom:14px;font-family:var(--mono)"></div>
+  <div id="search-list"></div>
+</div>
+
+<!-- FORM PAGE -->
+<div class="page" id="page-form">
+  <div style="margin-bottom:20px">
+    <div id="form-title" style="font-size:18px;font-weight:900;color:#fff">🔧 정비 기록 입력</div>
+    <div style="width:34px;height:2px;background:var(--red);margin-top:8px"></div>
+  </div>
+  <div id="form-err" class="err-box" style="display:none"></div>
+  <div class="grid2">
+    <div><label class="lbl">오토바이 번호 *</label><input class="inp" id="f-plate" placeholder="예: 서울12가3456" oninput="this.value=this.value.toUpperCase()"></div>
+    <div><label class="lbl">전화번호 *</label><input class="inp" id="f-phone" placeholder="예: 010-1234-5678"></div>
+    <div><label class="lbl">고객명</label><input class="inp" id="f-name" placeholder="선택 입력"></div>
+    <div><label class="lbl">정비 날짜 *</label><input class="inp" id="f-date" type="date"></div>
+    <div><label class="lbl">주행 거리 (km)</label><input class="inp" id="f-mileage" type="number" placeholder="예: 15000"></div>
+    <div><label class="lbl">정비 금액 (원) *</label><input class="inp" id="f-price" type="number" placeholder="예: 50000"></div>
+  </div>
+  <div class="grid2" style="margin-bottom:14px">
+    <div><label class="lbl">🏍 차량 종류</label><input class="inp" id="f-biketype" placeholder="예: Honda PCX 125"></div>
+    <div><label class="lbl">📅 연식</label><input class="inp" id="f-bikeyear" type="number" placeholder="예: 2022" min="1980" max="2099"></div>
+  </div>
+  <div style="margin-bottom:14px">
+    <label class="lbl">정비 목록 * (쉼표로 구분)</label>
+    <textarea class="inp" id="f-items" style="height:80px;resize:vertical" placeholder="예: 엔진오일 교체, 브레이크 패드 교체, 타이어 점검"></textarea>
+  </div>
+  <div style="margin-bottom:14px">
+    <label class="lbl">메모</label>
+    <textarea class="inp" id="f-memo" style="height:58px;resize:vertical" placeholder="추가 메모 (선택)"></textarea>
+  </div>
+  <div style="margin-bottom:22px">
+    <label class="lbl">📷 사진 첨부 (최대 8장)</label>
+    <div class="photo-drop" onclick="document.getElementById('f-photos').click()"
+      ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+      <div style="font-size:28px;margin-bottom:6px">📷</div>
+      <div style="font-size:13px;color:var(--dim)">클릭하거나 사진을 드래그</div>
+      <div style="font-size:11px;color:var(--dim2);margin-top:4px">고객·차량·정비 전후 사진</div>
+      <input type="file" id="f-photos" accept="image/*" multiple style="display:none" onchange="handlePhotoInput(this.files)">
+    </div>
+    <div id="photo-preview" style="display:flex;flex-wrap:wrap;margin-top:8px"></div>
+  </div>
+  <div style="display:flex;gap:10px">
+    <button class="btn-red" style="flex:1;font-size:15px;padding:14px" onclick="handleSave()">✅ 정비 기록 저장</button>
+    <button class="btn-ghost" onclick="cancelForm()">취소</button>
+  </div>
+  <input type="hidden" id="f-editid">
+</div>
+
+<!-- SAVED PAGE -->
+<div class="page" id="page-saved">
+  <div class="saved-wrap">
+    <div class="saved-check pop">✅</div>
+    <div id="saved-title" style="font-size:22px;font-weight:900;color:#fff;margin-bottom:6px">저장되었습니다!</div>
+    <div style="font-size:14px;color:#666;margin-bottom:28px">정비 기록이 성공적으로 저장되었습니다</div>
+    <div class="card" id="saved-summary" style="width:100%;max-width:500px;margin-bottom:22px"></div>
+    <div style="display:flex;gap:10px;width:100%;max-width:500px;margin-bottom:10px">
+      <button class="btn-red" style="flex:1;padding:13px" onclick="goPage('detail')">📋 정비 내역 보기</button>
+      <button class="btn-ghost" style="flex:1;padding:13px" onclick="savedAddMore()">🔧 추가 입력</button>
+    </div>
+    <button class="btn-ghost" style="width:100%;max-width:500px" onclick="goPage('search')">🔍 고객 검색으로</button>
+  </div>
+</div>
+
+<!-- DETAIL PAGE -->
+<div class="page" id="page-detail">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:10px">
+    <div>
+      <button class="btn-ghost" style="font-size:12px;margin-bottom:10px" onclick="goPage('search')">← 목록으로</button>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div id="detail-plate" style="font-size:22px;font-weight:900;color:#fff;font-family:var(--mono)"></div>
+        <div id="detail-name" style="font-size:14px;color:#aaa"></div>
+      </div>
+      <div id="detail-phone" style="font-size:13px;color:var(--muted);margin-top:3px"></div>
+    </div>
+    <button class="btn-red" onclick="addForDetail()">+ 정비 추가</button>
+  </div>
+  <div class="stat-grid" id="detail-stats"></div>
+  <div id="detail-count" style="font-size:11px;color:var(--dim);font-family:var(--mono);margin-bottom:12px"></div>
+  <div id="detail-list"></div>
+</div>
+
+<!-- STATS PAGE -->
+<div class="page" id="page-stats">
+  <div style="margin-bottom:20px">
+    <div style="font-size:18px;font-weight:900;color:#fff">📊 정비 통계</div>
+    <div style="width:34px;height:2px;background:var(--red);margin-top:8px"></div>
+  </div>
+  <div id="stats-content"></div>
+</div>
+
+<!-- SYNC MODAL -->
+<div class="modal-bg" id="modal-sync">
+  <div class="modal">
+    <div style="font-size:16px;font-weight:900;color:#fff;margin-bottom:6px">💾 데이터 백업</div>
+    <div style="font-size:12px;color:#666;margin-bottom:20px;line-height:1.6">
+      데이터는 클라우드에 자동 저장됩니다.<br>
+      아래에서 JSON 파일로 추가 백업하거나 복원할 수 있습니다.<br>
+      <span style="color:var(--red)">⚠️ 가져오기 시 현재 데이터가 덮어씌워집니다.</span>
+    </div>
+    <div style="background:var(--bg4);border:1px solid #222;padding:16px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px">📤 내보내기 (백업)</div>
+      <div style="font-size:12px;color:#666;margin-bottom:12px">현재 데이터 전체를 JSON 파일로 저장합니다</div>
+      <button class="btn-red" style="width:100%;padding:11px" id="export-btn" onclick="exportData()">JSON 파일로 내보내기</button>
+    </div>
+    <div style="background:var(--bg4);border:1px solid #222;padding:16px;margin-bottom:20px">
+      <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px">📥 가져오기 (복원)</div>
+      <div style="font-size:12px;color:#666;margin-bottom:12px">저장한 JSON 파일을 불러와 데이터를 복원합니다</div>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this.files[0])">
+      <button class="btn-ghost" style="width:100%;padding:11px" onclick="document.getElementById('import-file').click()">JSON 파일 가져오기</button>
+    </div>
+    <button class="btn-ghost" style="width:100%" onclick="closeSync()">닫기</button>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-bg" id="modal-del">
+  <div class="modal" style="max-width:320px">
+    <div style="font-size:16px;font-weight:700;margin-bottom:10px">정비 기록 삭제</div>
+    <div style="font-size:13px;color:#aaa;margin-bottom:22px">삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?</div>
+    <div style="display:flex;gap:10px">
+      <button style="flex:1;background:#c0392b;color:#fff;border:none;padding:11px;cursor:pointer;font-weight:700;font-size:14px" onclick="confirmDelete()">삭제</button>
+      <button class="btn-ghost" style="flex:1" onclick="document.getElementById('modal-del').classList.remove('open')">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lb" onclick="closeLb()">
+  <div style="position:relative;max-width:92vw;max-height:88vh" onclick="event.stopPropagation()">
+    <img id="lb-img" src="" style="max-width:88vw;max-height:78vh;object-fit:contain;display:block">
+    <div style="display:flex;justify-content:center;gap:10px;margin-top:12px" id="lb-ctrl"></div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<div id="toast"></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc, onSnapshot, writeBatch, query, where }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ─── Firebase 설정 ──────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyAO5rghs_pl69RqoFAoDFPsfqmsDRXOlCk",
+  authDomain: "moto-service-e7910.firebaseapp.com",
+  projectId: "moto-service-e7910",
+  storageBucket: "moto-service-e7910.firebasestorage.app",
+  messagingSenderId: "1056035935332",
+  appId: "1:1056035935332:web:c09eee927abbacff573b71",
+  measurementId: "G-0MHFDPVJQ7"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+let currentUser = null;
+let unsubCusts = null, unsubRecs = null;
+
+// ─── 로딩 ──────────────────────────────────────────────
+function showLoading(msg='불러오는 중...'){
+  document.getElementById('loading-msg').textContent = msg;
+  document.getElementById('loading-overlay').classList.add('show');
+}
+function hideLoading(){ document.getElementById('loading-overlay').classList.remove('show'); }
+
+// ─── 인증 상태 감지 ─────────────────────────────────────
+onAuthStateChanged(auth, user => {
+  if(user){
+    currentUser = user;
+    document.getElementById('page-login').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    startListening();
+  } else {
+    currentUser = null;
+    if(unsubCusts){ unsubCusts(); unsubCusts=null; }
+    if(unsubRecs) { unsubRecs();  unsubRecs=null;  }
+    document.getElementById('page-login').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+    hideLoading();
+  }
+});
+
+// ─── 실시간 리스닝 (Firestore → 앱) ─────────────────────
+function startListening(){
+  showLoading('데이터 불러오는 중...');
+  const uid = currentUser.uid;
+
+  let custsReady = false, recsReady = false;
+  function checkReady(){ if(custsReady && recsReady){ hideLoading(); renderSearch(); } }
+
+  unsubCusts = onSnapshot(collection(db, 'users', uid, 'custs'), snap => {
+    custs = snap.docs.map(d => d.data());
+    custsReady = true;
+    checkReady();
+    if(curPage==='search') renderSearch();
+    if(curPage==='detail') renderDetail();
+  }, err => {
+    setSyncStatus('err');
+    console.error(err);
+  });
+
+  unsubRecs = onSnapshot(collection(db, 'users', uid, 'recs'), snap => {
+    recs = snap.docs.map(d => d.data());
+    recsReady = true;
+    checkReady();
+    if(curPage==='search') renderSearch();
+    if(curPage==='detail') renderDetail();
+    if(curPage==='stats')  renderStats();
+  }, err => {
+    setSyncStatus('err');
+    console.error(err);
+  });
+
+  setSyncStatus('ok');
+}
+
+// ─── Firestore 저장 ─────────────────────────────────────
+async function saveToCloud(custObj, recObj, isEdit){
+  const uid = currentUser.uid;
+  try {
+    setSyncStatus('ok');
+    const batch = writeBatch(db);
+    // 고객 upsert
+    batch.set(doc(db, 'users', uid, 'custs', custObj.id), custObj);
+    // 정비 기록 set
+    batch.set(doc(db, 'users', uid, 'recs', recObj.id), recObj);
+    await batch.commit();
+  } catch(e){
+    setSyncStatus('err');
+    showToast('⚠️ 저장 실패: '+e.message);
+    throw e;
+  }
+}
+
+async function deleteFromCloud(recId){
+  const uid = currentUser.uid;
+  try {
+    await deleteDoc(doc(db, 'users', uid, 'recs', recId));
+  } catch(e){
+    setSyncStatus('err');
+    showToast('⚠️ 삭제 실패: '+e.message);
+    throw e;
+  }
+}
+
+// ─── JSON 가져오기 (일괄 업로드) ────────────────────────
+async function uploadAllToCloud(){
+  const uid = currentUser.uid;
+  showLoading('클라우드에 업로드 중...');
+  try {
+    const CHUNK = 400;
+    const allDocs = [
+      ...custs.map(c=>({col:'custs',id:c.id,data:c})),
+      ...recs.map(r=>({col:'recs', id:r.id,data:r}))
+    ];
+    for(let i=0;i<allDocs.length;i+=CHUNK){
+      const batch = writeBatch(db);
+      allDocs.slice(i,i+CHUNK).forEach(({col,id,data})=>{
+        batch.set(doc(db,'users',uid,col,id),data);
+      });
+      await batch.commit();
+    }
+    showToast('✅ 클라우드 업로드 완료');
+  } catch(e){
+    showToast('⚠️ 업로드 실패: '+e.message);
+  } finally { hideLoading(); }
+}
+
+// ─── 동기화 상태 표시 ────────────────────────────────────
+function setSyncStatus(s){
+  const el = document.getElementById('sync-status');
+  if(!el) return;
+  if(s==='ok'){ el.className='sync-ok'; el.textContent='☁️ 연결됨'; }
+  else if(s==='off'){ el.className='sync-off'; el.textContent='📴 오프라인'; }
+  else { el.className='sync-err'; el.textContent='⚠️ 오류'; }
+}
+
+// ─── 로그인 / 회원가입 / 로그아웃 ──────────────────────
+window.doLogin = async function(){
+  const email = document.getElementById('login-email').value.trim();
+  const pw    = document.getElementById('login-pw').value;
+  if(!email||!pw){ showLoginErr('이메일과 비밀번호를 입력해주세요.'); return; }
+  showLoading('로그인 중...');
+  try {
+    await signInWithEmailAndPassword(auth, email, pw);
+  } catch(e){
+    hideLoading();
+    const msg = e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'
+      ? '이메일 또는 비밀번호가 틀렸습니다.'
+      : e.code==='auth/user-not-found' ? '등록되지 않은 이메일입니다.'
+      : e.code==='auth/too-many-requests' ? '로그인 시도가 너무 많습니다. 잠시 후 다시 시도하세요.'
+      : e.message;
+    showLoginErr(msg);
+  }
+};
+
+window.doRegister = async function(){
+  const email = document.getElementById('login-email').value.trim();
+  const pw    = document.getElementById('login-pw').value;
+  if(!email||!pw){ showLoginErr('이메일과 비밀번호를 입력해주세요.'); return; }
+  if(pw.length<6){ showLoginErr('비밀번호는 6자 이상이어야 합니다.'); return; }
+  showLoading('계정 만드는 중...');
+  try {
+    await createUserWithEmailAndPassword(auth, email, pw);
+  } catch(e){
+    hideLoading();
+    const msg = e.code==='auth/email-already-in-use' ? '이미 사용 중인 이메일입니다.'
+      : e.code==='auth/invalid-email' ? '이메일 형식이 올바르지 않습니다.'
+      : e.message;
+    showLoginErr(msg);
+  }
+};
+
+window.doLogout = async function(){
+  if(!confirm('로그아웃 하시겠습니까?')) return;
+  await signOut(auth);
+};
+
+window.doResetPw = async function(){
+  const email = document.getElementById('login-email').value.trim();
+  if(!email){ showLoginErr('이메일을 먼저 입력해주세요.'); return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    showLoginErr('✅ 비밀번호 재설정 이메일을 발송했습니다.');
+    document.getElementById('login-err').style.background='#0d2b0d';
+    document.getElementById('login-err').style.borderColor='#1a4a1a';
+    document.getElementById('login-err').style.color='#2ecc71';
+  } catch(e){
+    showLoginErr('이메일 발송 실패: '+e.message);
+  }
+};
+
+function showLoginErr(msg){
+  const el = document.getElementById('login-err');
+  el.textContent = msg; el.style.display='block';
+  el.style.background=''; el.style.borderColor=''; el.style.color='';
+}
+
+// ─── handleSave 오버라이드 (Firebase 저장) ───────────────
+window.handleSave = async function(){
+  const plate   = document.getElementById('f-plate').value.trim().toUpperCase();
+  const phone   = document.getElementById('f-phone').value.trim();
+  const name    = document.getElementById('f-name').value.trim();
+  const date    = document.getElementById('f-date').value;
+  const mileage = document.getElementById('f-mileage').value;
+  const price   = document.getElementById('f-price').value;
+  const items   = document.getElementById('f-items').value.trim();
+  const memo    = document.getElementById('f-memo').value.trim();
+  const editId  = document.getElementById('f-editid').value;
+  const bikeType = document.getElementById('f-biketype').value.trim();
+  const bikeYear = document.getElementById('f-bikeyear').value.trim();
+
+  if(!plate)  return showErr('오토바이 번호를 입력해주세요.');
+  if(!phone)  return showErr('전화번호를 입력해주세요.');
+  if(!date)   return showErr('날짜를 입력해주세요.');
+  if(!items)  return showErr('정비 목록을 입력해주세요.');
+  if(!price)  return showErr('금액을 입력해주세요.');
+
+  showLoading('저장 중...');
+
+  // 고객 upsert (메모리)
+  const ci = custs.findIndex(c=>c.plateNumber===plate);
+  let custObj;
+  if(ci>=0){
+    custs[ci] = {...custs[ci], phone, ownerName: name||custs[ci].ownerName};
+    custObj = custs[ci];
+  } else {
+    custObj = {id: 'c_'+Date.now(), plateNumber:plate, phone, ownerName:name};
+    custs.push(custObj);
+  }
+
+  const isEdit = !!editId;
+  let recObj;
+  if(isEdit){
+    recObj = {...recs.find(r=>r.id===editId), plateNumber:plate, phone, ownerName:name, bikeType, bikeYear, date, mileage, items, price:Number(price), memo, photos:[...formPhotos]};
+    recs = recs.map(r=>r.id===editId ? recObj : r);
+  } else {
+    recObj = {id:'r_'+Date.now(), plateNumber:plate, phone, ownerName:name, bikeType, bikeYear, date, mileage, items, price:Number(price), memo, photos:[...formPhotos]};
+    recs.push(recObj);
+  }
+
+  try {
+    await saveToCloud(custObj, recObj, isEdit);
+    hideLoading();
+    curPlate = plate; savedPlate = plate; savedPhone = phone; savedName = name;
+    renderSaved({plate,phone,ownerName:name,date,mileage,price:Number(price),items,memo,photos:[...formPhotos],isEdit,bikeType,bikeYear});
+    goPage('saved');
+  } catch(e){
+    hideLoading();
+  }
+};
+
+// ─── confirmDelete 오버라이드 ───────────────────────────
+window.confirmDelete = async function(){
+  showLoading('삭제 중...');
+  try {
+    await deleteFromCloud(pendingDelId);
+    recs = recs.filter(r=>r.id!==pendingDelId);
+    hideLoading();
+    document.getElementById('modal-del').classList.remove('open');
+    if(!recs.filter(r=>r.plateNumber===curPlate).length){ goPage('search'); return; }
+    renderDetail();
+  } catch(e){
+    hideLoading();
+  }
+};
+
+// ─── importData 오버라이드 ──────────────────────────────
+window.importData = async function(file){
+  if(!file) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if(!data.custs||!data.recs) return showToast('⚠️ 올바른 백업 파일이 아닙니다');
+    if(!confirm('현재 데이터('+recs.length+'건)가 백업 파일('+data.recs.length+'건)로 교체됩니다.\n계속하시겠습니까?')) return;
+    custs = data.custs; recs = data.recs;
+    await uploadAllToCloud();
+    showToast('✅ 데이터를 불러왔습니다 ('+data.recs.length+'건)');
+    closeSync(); renderSearch();
+  } catch { showToast('⚠️ 파일을 읽는 중 오류가 발생했습니다'); }
+};
+
+</script>
+
+<script>
+// ─── 앱 상태 ──────────────────────────────────────────────
+let custs = [];
+let recs  = [];
+let curPage   = 'search';
+let curPlate  = '';
+let pendingDelId = '';
+let formPhotos = [];
+let lbList = [], lbIdx = 0;
+let savedPlate = '', savedPhone = '', savedName = '';
+
+// ─── UTILS ───────────────────────────────────────────────
+const fmt = n => Number(n||0).toLocaleString('ko-KR');
+const fmtDate = d => {
+  if(!d) return '';
+  const dt = new Date(d+'T00:00:00');
+  return dt.getFullYear()+'.'+String(dt.getMonth()+1).padStart(2,'0')+'.'+String(dt.getDate()).padStart(2,'0');
+};
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display='block';
+  clearTimeout(t._to); t._to = setTimeout(()=>t.style.display='none', 2500);
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────
+function goPage(p){
+  if(p==='form'){ resetForm(); }
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  const nb = document.getElementById('nav-'+p);
+  if(nb) nb.classList.add('active');
+  curPage = p;
+  window.scrollTo(0,0);
+  if(p==='search') renderSearch();
+  if(p==='detail') renderDetail();
+  if(p==='stats')  renderStats();
+}
+
+// ─── SEARCH ──────────────────────────────────────────────
+function renderSearch(){
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const filtered = q ? custs.filter(c =>
+    c.plateNumber.toLowerCase().includes(q) ||
+    c.phone.replace(/-/g,'').includes(q.replace(/-/g,'')) ||
+    (c.ownerName||'').toLowerCase().includes(q)
+  ) : custs;
+
+  document.getElementById('search-info').textContent = '고객 '+custs.length+'명 · 정비 '+recs.length+'건';
+
+  if(!filtered.length){
+    document.getElementById('search-list').innerHTML =
+      '<div style="text-align:center;padding:60px 0;color:var(--dim2)"><div style="font-size:40px;margin-bottom:12px">🏍️</div><div>'+(q?'검색 결과 없음':'등록된 고객이 없습니다')+'</div></div>';
+    return;
+  }
+
+  let html = '';
+  filtered.forEach(c => {
+    const cr    = recs.filter(r=>r.plateNumber===c.plateNumber);
+    const total = cr.reduce((s,r)=>s+r.price,0);
+    const latest= [...cr].sort((a,b)=>new Date(b.date)-new Date(a.date))[0];
+    const hasPhoto = cr.some(r=>r.photos&&r.photos.length>0);
+    html += `<div class="cust-row" onclick="openCustomer('${esc(c.plateNumber)}')">
+      <div style="width:44px;height:44px;background:#1f1f26;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;position:relative">
+        🏍${hasPhoto?'<span style="position:absolute;top:-2px;right:-2px;background:var(--red);border-radius:50%;width:12px;height:12px;font-size:8px;display:flex;align-items:center;justify-content:center;color:#fff">📷</span>':''}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span style="font-weight:900;font-size:15px;color:#fff;font-family:var(--mono)">${esc(c.plateNumber)}</span>
+          ${c.ownerName?`<span style="font-size:13px;color:#aaa">${esc(c.ownerName)}</span>`:''}
+          <span class="or-tag">${cr.length}건</span>
+        </div>
+        <div style="font-size:12px;color:#666">📞 ${esc(c.phone)}${latest?` <span style="margin-left:8px">최근: ${fmtDate(latest.date)}</span>`:''}${latest&&latest.bikeType?` <span style="margin-left:8px;color:#ff6a2a">🏍 ${esc(latest.bikeType)}${latest.bikeYear?' ('+esc(latest.bikeYear)+'년형)':''}</span>`:''}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:15px;font-weight:700;color:var(--red);font-family:var(--mono)">₩${fmt(total)}</div>
+        <div style="font-size:10px;color:var(--dim)">누적</div>
+      </div>
+      <div style="color:var(--dim);font-size:18px">›</div>
+    </div>`;
+  });
+  document.getElementById('search-list').innerHTML = html;
+}
+
+function openCustomer(plate){ curPlate = plate; goPage('detail'); }
+
+// ─── FORM ────────────────────────────────────────────────
+function resetForm(){
+  document.getElementById('f-plate').value   = '';
+  document.getElementById('f-phone').value   = '';
+  document.getElementById('f-name').value    = '';
+  document.getElementById('f-date').value    = new Date().toISOString().split('T')[0];
+  document.getElementById('f-mileage').value = '';
+  document.getElementById('f-price').value   = '';
+  document.getElementById('f-items').value   = '';
+  document.getElementById('f-memo').value    = '';
+  document.getElementById('f-editid').value  = '';
+  document.getElementById('form-title').textContent = '🔧 정비 기록 입력';
+  document.querySelector('#page-form .btn-red').textContent = '✅ 정비 기록 저장';
+  document.getElementById('f-biketype').value = '';
+  document.getElementById('f-bikeyear').value = '';
+  formPhotos = [];
+  renderPhotoPreview();
+  hideErr();
+}
+
+function prefillForm(plate, phone, name){
+  resetForm();
+  document.getElementById('f-plate').value = plate||'';
+  document.getElementById('f-phone').value = phone||'';
+  document.getElementById('f-name').value  = name||'';
+}
+
+function fillFormEdit(r){
+  document.getElementById('f-plate').value   = r.plateNumber||'';
+  document.getElementById('f-phone').value   = r.phone||'';
+  document.getElementById('f-name').value    = r.ownerName||'';
+  document.getElementById('f-date').value    = r.date||'';
+  document.getElementById('f-mileage').value = r.mileage||'';
+  document.getElementById('f-price').value   = r.price||'';
+  document.getElementById('f-items').value   = r.items||'';
+  document.getElementById('f-memo').value    = r.memo||'';
+  document.getElementById('f-editid').value  = r.id;
+  document.getElementById('form-title').textContent = '✏️ 정비 수정';
+  document.querySelector('#page-form .btn-red').textContent = '✅ 수정 완료';
+  document.getElementById('f-biketype').value = r.bikeType||'';
+  document.getElementById('f-bikeyear').value = r.bikeYear||'';
+  formPhotos = r.photos ? [...r.photos] : [];
+  renderPhotoPreview();
+  hideErr();
+}
+
+function showErr(msg){
+  const el = document.getElementById('form-err');
+  el.textContent = '⚠️ '+msg; el.style.display='block';
+  setTimeout(()=>el.style.display='none',3000);
+}
+function hideErr(){ document.getElementById('form-err').style.display='none'; }
+
+function cancelForm(){ resetForm(); goPage(curPlate ? 'detail' : 'search'); }
+
+// ─── SAVED ───────────────────────────────────────────────
+function renderSaved(d){
+  document.getElementById('saved-title').textContent = d.isEdit ? '수정되었습니다' : '저장되었습니다!';
+  const photosHtml = (d.photos&&d.photos.length)
+    ? `<div style="margin-top:10px"><span class="lbl">첨부 사진 ${d.photos.length}장</span><div style="display:flex;flex-wrap:wrap;margin-top:6px">${d.photos.map((s,i)=>`<div class="photo-wrap"><img class="photo-thumb" src="${s}" onclick="openLb(savedPhotos,${i})"></div>`).join('')}</div></div>`
+    : '';
+  window.savedPhotos = d.photos||[];
+  document.getElementById('saved-summary').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #1e1e28">
+      <span style="font-size:18px;font-weight:900;color:#fff;font-family:var(--mono)">${esc(d.plate)}</span>
+      ${d.ownerName?`<span style="color:#aaa;font-size:14px">${esc(d.ownerName)}</span>`:''}
+      ${d.bikeType?`<span style="background:#1f1f26;color:#ff6a2a;font-size:12px;padding:2px 9px;border:1px solid var(--border2)">🏍 ${esc(d.bikeType)}${d.bikeYear?' ('+esc(d.bikeYear)+'년형)':''}</span>`:''}
+    </div>
+    <div class="grid2" style="margin-bottom:12px">
+      <div><span class="lbl">날짜</span><div style="font-size:14px;font-family:var(--mono)">${fmtDate(d.date)}</div></div>
+      ${d.mileage?`<div><span class="lbl">주행거리</span><div style="font-size:14px;font-family:var(--mono)">${fmt(Number(d.mileage))} km</div></div>`:'<div></div>'}
+      <div><span class="lbl">정비 금액</span><div style="font-size:17px;font-weight:900;color:var(--red);font-family:var(--mono)">₩${fmt(d.price)}</div></div>
+      <div><span class="lbl">전화번호</span><div style="font-size:14px">${esc(d.phone)}</div></div>
+    </div>
+    <span class="lbl">작업 내역</span>
+    <div>${d.items.split(',').map(s=>`<span class="tag">${esc(s.trim())}</span>`).join('')}</div>
+    ${photosHtml}
+  `;
+}
+
+function savedAddMore(){
+  prefillForm(savedPlate, savedPhone, savedName);
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('nav-form').classList.add('active');
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-form').classList.add('active');
+  curPage='form'; window.scrollTo(0,0);
+}
+
+// ─── DETAIL ──────────────────────────────────────────────
+function renderDetail(){
+  const cust = custs.find(c=>c.plateNumber===curPlate);
+  const dRecs = recs.filter(r=>r.plateNumber===curPlate).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const total = dRecs.reduce((s,r)=>s+r.price,0);
+  const avg   = dRecs.length ? Math.round(total/dRecs.length) : 0;
+
+  document.getElementById('detail-plate').textContent  = curPlate;
+  document.getElementById('detail-name').textContent   = cust&&cust.ownerName ? cust.ownerName : '';
+  document.getElementById('detail-phone').textContent  = cust ? '📞 '+cust.phone : '';
+  document.getElementById('detail-count').textContent  = '정비 이력 '+dRecs.length+'건 (최신순)';
+
+  document.getElementById('detail-stats').innerHTML = `
+    <div class="card"><div style="font-size:20px;margin-bottom:6px">🔧</div><div style="font-size:16px;font-weight:900;color:var(--red);font-family:var(--mono)">${dRecs.length}회</div><div style="font-size:11px;color:#666;margin-top:2px">총 정비 횟수</div></div>
+    <div class="card"><div style="font-size:20px;margin-bottom:6px">💰</div><div style="font-size:16px;font-weight:900;color:var(--red);font-family:var(--mono)">₩${fmt(total)}</div><div style="font-size:11px;color:#666;margin-top:2px">총 정비 금액</div></div>
+    <div class="card"><div style="font-size:20px;margin-bottom:6px">📊</div><div style="font-size:16px;font-weight:900;color:var(--red);font-family:var(--mono)">₩${fmt(avg)}</div><div style="font-size:11px;color:#666;margin-top:2px">회당 평균</div></div>
+  `;
+
+  if(!dRecs.length){
+    document.getElementById('detail-list').innerHTML =
+      '<div style="text-align:center;padding:44px 0;color:var(--dim2);border:1px dashed var(--border2)"><div style="font-size:34px;margin-bottom:10px">🔧</div><div>정비 기록이 없습니다</div></div>';
+    return;
+  }
+
+  let html = '';
+  dRecs.forEach((r,idx)=>{
+    const photosHtml = (r.photos&&r.photos.length)
+      ? `<div style="margin-bottom:8px"><span class="lbl">📷 사진 ${r.photos.length}장</span><div style="display:flex;flex-wrap:wrap;margin-top:4px">${r.photos.map((s,i)=>`<div class="photo-wrap"><img class="photo-thumb" src="${s}" onclick="openLbRec('${esc(r.id)}',${i})"></div>`).join('')}</div></div>`
+      : '';
+    html += `<div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #1e1e28;flex-wrap:wrap;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="background:var(--red);color:#fff;font-size:10px;font-weight:900;padding:2px 7px">#${dRecs.length-idx}</span>
+          <span style="font-size:14px;font-weight:700;color:#ff6a2a;font-family:var(--mono)">📅 ${fmtDate(r.date)}</span>
+          ${r.mileage
+            ?`<span style="font-size:13px;color:#888;font-family:var(--mono)">🏁 ${fmt(Number(r.mileage))} km</span>`
+            :'<span style="font-size:12px;color:#3a3a44">주행거리 미기록</span>'}
+        </div>
+        <div style="font-size:18px;font-weight:900;color:#fff;font-family:var(--mono)">₩${fmt(r.price)}</div>
+      </div>
+      ${r.bikeType?`<div style="margin-bottom:8px"><span style="background:#1f1f26;color:#ff6a2a;font-size:13px;padding:3px 11px;border:1px solid var(--border2)">🏍 ${esc(r.bikeType)}${r.bikeYear?' ('+esc(r.bikeYear)+'년형)':''}</span></div>`:''}
+      <div style="margin-bottom:8px">
+        <span class="lbl">작업 내역</span>
+        <div>${r.items.split(',').map(s=>`<span class="tag">${esc(s.trim())}</span>`).join('')}</div>
+      </div>
+      ${r.memo?`<div style="background:var(--bg4);border:1px solid #1e1e26;padding:8px 12px;margin-bottom:8px"><span style="font-size:11px;color:#666;font-weight:700;margin-right:8px">📝 메모</span><span style="font-size:13px;color:#999">${esc(r.memo)}</span></div>`:''}
+      ${photosHtml}
+      <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+        <button class="btn-ghost" style="padding:5px 13px;font-size:12px" onclick="editRec('${esc(r.id)}')">✏️ 수정</button>
+        <button style="background:transparent;color:#e55;border:1px solid #4a2020;cursor:pointer;padding:5px 13px;font-size:12px" onclick="askDelete('${esc(r.id)}')">🗑 삭제</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('detail-list').innerHTML = html;
+}
+
+function addForDetail(){
+  const cust = custs.find(c=>c.plateNumber===curPlate);
+  prefillForm(curPlate, cust?cust.phone:'', cust?cust.ownerName:'');
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-form').classList.add('active');
+  document.getElementById('nav-form').classList.add('active');
+  curPage='form'; window.scrollTo(0,0);
+}
+
+function editRec(id){
+  const r = recs.find(x=>x.id===id);
+  if(!r) return;
+  fillFormEdit(r);
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-form').classList.add('active');
+  document.getElementById('nav-form').classList.add('active');
+  curPage='form'; window.scrollTo(0,0);
+}
+
+function askDelete(id){
+  pendingDelId = id;
+  document.getElementById('modal-del').classList.add('open');
+}
+
+// ─── STATS ───────────────────────────────────────────────
+function renderStats(){
+  if(!recs.length){
+    document.getElementById('stats-content').innerHTML =
+      '<div style="text-align:center;padding:60px 0;color:var(--dim2)"><div style="font-size:38px;margin-bottom:10px">📊</div><div>정비 기록이 없습니다</div></div>';
+    return;
+  }
+  const monthly={}, yearly={};
+  recs.forEach(r=>{
+    const dt=new Date(r.date+'T00:00:00'), y=dt.getFullYear();
+    const mk=y+'-'+String(dt.getMonth()+1).padStart(2,'0');
+    monthly[mk]=(monthly[mk]||0)+r.price;
+    yearly[y]  =(yearly[y]  ||0)+r.price;
+  });
+  const mKeys=Object.keys(monthly).sort().slice(-12);
+  const yKeys=Object.keys(yearly).sort();
+  const mAvg=mKeys.length?Math.round(mKeys.reduce((s,k)=>s+monthly[k],0)/mKeys.length):0;
+  const yAvg=yKeys.length?Math.round(yKeys.reduce((s,k)=>s+yearly[k],0)/yKeys.length):0;
+  const now=new Date();
+  const nowMK=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const thisM=monthly[nowMK]||0, thisY=yearly[now.getFullYear()]||0;
+
+  let mBars='', yBars='';
+  const mMax=Math.max(...mKeys.map(k=>monthly[k]));
+  mKeys.slice().reverse().forEach(k=>{
+    const pct=mMax?(monthly[k]/mMax)*100:0;
+    mBars+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
+      <div style="width:65px;font-size:11px;color:#888;font-family:var(--mono);flex-shrink:0">${k}</div>
+      <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:linear-gradient(90deg,#ff4d00,#ff6a2a)"></div>
+      <div class="bar-lbl">₩${fmt(monthly[k])}</div></div></div>`;
+  });
+  const yMax=Math.max(...yKeys.map(k=>yearly[k]));
+  yKeys.slice().reverse().forEach(k=>{
+    const pct=yMax?(yearly[k]/yMax)*100:0;
+    yBars+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
+      <div style="width:65px;font-size:11px;color:#888;font-family:var(--mono);flex-shrink:0">${k}년</div>
+      <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:linear-gradient(90deg,#ff7700,#ffa040)"></div>
+      <div class="bar-lbl">₩${fmt(yearly[k])}</div></div></div>`;
+  });
+
+  document.getElementById('stats-content').innerHTML = `
+    <div class="stat-grid2">
+      <div class="card"><div style="font-size:22px;margin-bottom:8px">📅</div><div style="font-size:22px;font-weight:900;color:var(--red);font-family:var(--mono);margin-bottom:4px">₩${fmt(thisM)}</div><div style="font-size:13px;color:#ccc;font-weight:700">이번 달 매출</div></div>
+      <div class="card"><div style="font-size:22px;margin-bottom:8px">📆</div><div style="font-size:22px;font-weight:900;color:var(--red);font-family:var(--mono);margin-bottom:4px">₩${fmt(thisY)}</div><div style="font-size:13px;color:#ccc;font-weight:700">올해 매출</div></div>
+      <div class="card"><div style="font-size:22px;margin-bottom:8px">📈</div><div style="font-size:22px;font-weight:900;color:var(--red);font-family:var(--mono);margin-bottom:4px">₩${fmt(mAvg)}</div><div style="font-size:13px;color:#ccc;font-weight:700">월 평균 매출</div></div>
+      <div class="card"><div style="font-size:22px;margin-bottom:8px">💹</div><div style="font-size:22px;font-weight:900;color:var(--red);font-family:var(--mono);margin-bottom:4px">₩${fmt(yAvg)}</div><div style="font-size:13px;color:#ccc;font-weight:700">연 평균 매출</div></div>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;color:#777;letter-spacing:.1em;margin-bottom:14px">월별 매출 (최근 12개월)</div>
+      ${mBars}
+    </div>
+    <div class="card">
+      <div style="font-size:12px;font-weight:700;color:#777;letter-spacing:.1em;margin-bottom:14px">연도별 매출</div>
+      ${yBars}
+    </div>`;
+}
+
+// ─── PHOTOS ──────────────────────────────────────────────
+function toBase64(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); }
+
+async function handlePhotoInput(files){
+  const arr=Array.from(files).slice(0,8-formPhotos.length);
+  const b64s=await Promise.all(arr.map(toBase64));
+  formPhotos=[...formPhotos,...b64s].slice(0,8);
+  renderPhotoPreview();
+}
+
+function handleDrop(e){ e.preventDefault(); handlePhotoInput(e.dataTransfer.files); }
+function removePhoto(i){ formPhotos.splice(i,1); renderPhotoPreview(); }
+function renderPhotoPreview(){
+  document.getElementById('photo-preview').innerHTML =
+    formPhotos.map((s,i)=>`<div class="photo-wrap"><img class="photo-thumb" src="${s}" onclick="openLb(formPhotos,${i})"><button class="photo-del" onclick="removePhoto(${i})">✕</button></div>`).join('');
+}
+
+// ─── LIGHTBOX ────────────────────────────────────────────
+function openLb(list, idx){ lbList=[...list]; lbIdx=idx; document.getElementById('lb-img').src=lbList[lbIdx]; renderLbCtrl(); document.getElementById('lb').classList.add('open'); }
+function openLbRec(id, idx){ const r=recs.find(x=>x.id===id); if(r&&r.photos) openLb(r.photos,idx); }
+function renderLbCtrl(){
+  const el=document.getElementById('lb-ctrl');
+  if(lbList.length>1){
+    el.innerHTML=`<button onclick="lbPrev()" style="background:#333;color:#fff;border:none;padding:8px 18px;cursor:pointer;font-size:16px">‹</button>
+      <span style="color:#888;font-size:13px;align-self:center">${lbIdx+1} / ${lbList.length}</span>
+      <button onclick="lbNext()" style="background:#333;color:#fff;border:none;padding:8px 18px;cursor:pointer;font-size:16px">›</button>
+      <button onclick="closeLb()" style="background:#c0392b;color:#fff;border:none;padding:8px 16px;cursor:pointer;font-size:13px">닫기</button>`;
+  } else {
+    el.innerHTML=`<button onclick="closeLb()" style="background:#c0392b;color:#fff;border:none;padding:8px 16px;cursor:pointer;font-size:13px">닫기</button>`;
+  }
+}
+function lbPrev(){ lbIdx=(lbIdx-1+lbList.length)%lbList.length; document.getElementById('lb-img').src=lbList[lbIdx]; renderLbCtrl(); }
+function lbNext(){ lbIdx=(lbIdx+1)%lbList.length; document.getElementById('lb-img').src=lbList[lbIdx]; renderLbCtrl(); }
+function closeLb(){ document.getElementById('lb').classList.remove('open'); }
+
+// ─── SYNC (백업) ─────────────────────────────────────────
+function openSync(){
+  document.getElementById('export-btn').textContent='JSON 파일로 내보내기 ('+recs.length+'건)';
+  document.getElementById('modal-sync').classList.add('open');
+}
+function closeSync(){ document.getElementById('modal-sync').classList.remove('open'); }
+
+function exportData(){
+  const data={custs,recs,exportedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='moto-backup-'+new Date().toISOString().split('T')[0]+'.json';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('✅ 백업 파일이 저장되었습니다');
+}
+</script>
+</body>
+</html>
